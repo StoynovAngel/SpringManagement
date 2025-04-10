@@ -4,18 +4,17 @@ import com.angel.uni.management.entity.Student;
 import com.angel.uni.management.entity.Teacher;
 import com.angel.uni.management.enums.GradeType;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 @Entity
+@SuperBuilder
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "grade_format")
 public abstract class Grade {
@@ -27,11 +26,11 @@ public abstract class Grade {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "student_id", nullable = false)
     private Student student;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "teacher_id", nullable = false)
     private Teacher teacher;
 
@@ -42,11 +41,10 @@ public abstract class Grade {
     @Column(name = "mark", nullable = false)
     private double mark;
 
-    @Temporal(TemporalType.DATE)
     @Column(name = "date_of_grading", nullable = false)
-    private Date dateOfGrading;
+    private LocalDateTime dateOfGrading;
 
-    public Grade(String name, Student student, Teacher teacher, GradeType gradeType, double mark, Date dateOfGrading) {
+    public Grade(String name, Student student, Teacher teacher, GradeType gradeType, double mark, LocalDateTime dateOfGrading) {
         this.name = name;
         this.student = student;
         this.teacher = teacher;

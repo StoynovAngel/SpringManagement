@@ -14,4 +14,10 @@ public class GlobalExceptionHandler {
     public String handleBadRequestException(BadRequestException e) {
         return e.getMessage();
     }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    @ResponseStatus(value = HttpStatus.NOT_FOUND)
+    public String handleResourceNotFoundException(ResourceNotFoundException e) {
+        return e.getMessage();
+    }
 }

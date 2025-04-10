@@ -2,6 +2,7 @@ package com.angel.uni.management.entity.grade;
 
 import com.angel.uni.management.entity.Student;
 import com.angel.uni.management.entity.Teacher;
+import com.angel.uni.management.enums.CountryEnum;
 import com.angel.uni.management.enums.GradeType;
 import jakarta.persistence.*;
 import lombok.*;
@@ -11,13 +12,12 @@ import java.time.LocalDateTime;
 
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Getter
 @Setter
 @Entity
-@SuperBuilder
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "grade_format")
-public abstract class Grade {
+@Table(name = "grade")
+public class Grade {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", updatable = false, nullable = false)
@@ -44,18 +44,6 @@ public abstract class Grade {
     @Column(name = "date_of_grading", nullable = false)
     private LocalDateTime dateOfGrading;
 
-    public Grade(String name, Student student, Teacher teacher, GradeType gradeType, double mark, LocalDateTime dateOfGrading) {
-        this.name = name;
-        this.student = student;
-        this.teacher = teacher;
-        this.gradeType = gradeType;
-        setDateOfGrading(dateOfGrading);
-        setMark(mark);
-    }
-
-    protected abstract void validateMark(double mark);
-    public void setMark(double mark) {
-        validateMark(mark);
-        this.mark = mark;
-    }
+    @Column(name = "country", nullable = false)
+    private CountryEnum countryRepresentation;
 }

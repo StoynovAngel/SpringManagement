@@ -4,7 +4,8 @@ import com.angel.uni.management.entity.Student;
 import com.angel.uni.management.entity.Teacher;
 import com.angel.uni.management.entity.UniversityGroup;
 import com.angel.uni.management.entity.UniversitySubject;
-import com.angel.uni.management.entity.grade.GradeBulgarian;
+import com.angel.uni.management.entity.grade.Grade;
+import com.angel.uni.management.enums.CountryEnum;
 import com.angel.uni.management.enums.GradeType;
 
 import java.time.LocalDateTime;
@@ -29,14 +30,15 @@ public class TestData {
                 .build();
     }
 
-    public GradeBulgarian createGrade() {
-        return GradeBulgarian.builder()
+    public Grade createGrade() {
+        return Grade.builder()
                 .name("grade")
                 .student(createStudent())
                 .teacher(createTeacher())
                 .gradeType(GradeType.FINAL)
                 .mark(MARK)
                 .dateOfGrading(LocalDateTime.now())
+                .countryRepresentation(CountryEnum.BG)
                 .build();
     }
 

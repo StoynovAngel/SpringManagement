@@ -2,7 +2,7 @@ package com.angel.uni.management.repositories;
 
 import com.angel.uni.management.config.TestDataConfig;
 import com.angel.uni.management.data.TestData;
-import com.angel.uni.management.entity.grade.GradeBulgarian;
+import com.angel.uni.management.entity.grade.Grade;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,16 +26,16 @@ class GradeRepositoryTest {
     @Autowired
     private TestData testData;
 
-    private GradeBulgarian gradeBulgarian;
+    private Grade grade;
 
     @BeforeEach
     void setUp() {
-        gradeBulgarian = testData.createGrade();
+        grade = testData.createGrade();
     }
 
     @Test
     void testGradeRepository_Save() {
-        GradeBulgarian saved = gradeRepository.save(gradeBulgarian);
+        Grade saved = gradeRepository.save(grade);
         assertNotNull(saved);
         Assertions.assertThat(saved.getId()).isGreaterThan(0);
     }

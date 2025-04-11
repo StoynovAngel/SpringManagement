@@ -13,6 +13,7 @@ import java.util.List;
 @Getter
 @Setter
 public class UniversitySubject {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")

@@ -2,7 +2,7 @@ package com.angel.uni.management.repositories;
 
 import com.angel.uni.management.config.TestDataConfig;
 import com.angel.uni.management.data.TestData;
-import com.angel.uni.management.entity.grade.Grade;
+import com.angel.uni.management.entity.Grade;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

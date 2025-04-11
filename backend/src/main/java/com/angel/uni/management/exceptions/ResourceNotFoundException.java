@@ -1,8 +1,5 @@
 package com.angel.uni.management.exceptions;
 
-/**
- *
- */
 public class ResourceNotFoundException extends RuntimeException {
 
     public ResourceNotFoundException(String message) {

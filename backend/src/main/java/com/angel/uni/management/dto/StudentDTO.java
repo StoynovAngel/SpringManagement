@@ -1,6 +1,9 @@
 package com.angel.uni.management.dto;
 
+import lombok.Builder;
+
 import java.util.List;
 
-public record StudentDTO(String username, List<GradeDTO> grades, double averageGradeOverall) {
+@Builder
+public record StudentDTO(Long id, String username, List<GradeDTO> grades, Double averageGradeOverall) {
 }

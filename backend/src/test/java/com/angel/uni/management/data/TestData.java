@@ -4,7 +4,7 @@ import com.angel.uni.management.entity.Student;
 import com.angel.uni.management.entity.Teacher;
 import com.angel.uni.management.entity.UniversityGroup;
 import com.angel.uni.management.entity.UniversitySubject;
-import com.angel.uni.management.entity.grade.Grade;
+import com.angel.uni.management.entity.Grade;
 import com.angel.uni.management.enums.CountryEnum;
 import com.angel.uni.management.enums.GradeType;
 
@@ -33,7 +33,6 @@ public class TestData {
     public Grade createGrade() {
         return Grade.builder()
                 .name("grade")
-                .student(createStudent())
                 .teacher(createTeacher())
                 .gradeType(GradeType.FINAL)
                 .mark(MARK)

@@ -1,6 +1,9 @@
 package com.angel.uni.management.dto;
 
+import lombok.Builder;
+
 import java.util.List;
 
-public record SubjectDTO(String name, int hoursPerWeek, String description, TeacherDTO teacher, List<StudentDTO> students) {
+@Builder
+public record SubjectDTO(Long id, String name, int hoursPerWeek, String description, Long teacherId, List<StudentDTO> students) {
 }

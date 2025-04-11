@@ -12,6 +12,7 @@ import lombok.*;
 @AllArgsConstructor
 
 public class Teacher  {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")

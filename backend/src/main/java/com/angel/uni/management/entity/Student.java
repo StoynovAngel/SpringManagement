@@ -1,6 +1,5 @@
 package com.angel.uni.management.entity;
 
-import com.angel.uni.management.entity.grade.Grade;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -14,15 +13,17 @@ import java.util.List;
 @Getter
 @Setter
 public class Student {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "username", nullable = false)
+    @Column(name = "username")
     private String username;
 
-    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "student_id")
     private List<Grade> grades;
 
     @Column(name = "average_grade_overall")

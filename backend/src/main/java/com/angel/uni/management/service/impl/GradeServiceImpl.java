@@ -40,17 +40,10 @@ public class GradeServiceImpl implements GradeService {
         }
 
         Teacher teacher = teacherRepository.findById(gradeDTO.teacherId()).orElseThrow(() -> new ResourceNotFoundException("Teacher not found with this id: " + gradeDTO.teacherId()));
-        Grade grade = Grade.builder()
-                .id(gradeDTO.id())
-                .name(gradeDTO.name())
-                .teacher(teacher)
-                .gradeType(gradeDTO.gradeType())
-                .mark(gradeDTO.mark())
-                .dateOfGrading(gradeDTO.dateOfGrading())
-                .countryRepresentation(gradeDTO.countryEnum())
-                .build();
 
-        Grade savedGrade = gradeRepository.save(grade);
+        Grade grade1 = gradeEntityMapper.apply(gradeDTO);
+        grade1.setTeacher(teacher);
+        Grade savedGrade = gradeRepository.save(grade1);
         return gradeDTOMapper.apply(savedGrade);
     }
 

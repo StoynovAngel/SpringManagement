@@ -1,6 +1,5 @@
 package com.angel.uni.management.controller;
 
-import com.angel.uni.management.dto.StudentDTO;
 import com.angel.uni.management.dto.TeacherDTO;
 import com.angel.uni.management.service.TeacherService;
 import com.fasterxml.jackson.databind.ObjectMapper;

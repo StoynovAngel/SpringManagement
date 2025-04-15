@@ -1,6 +1,7 @@
 package com.angel.uni.management.controller;
 
-import com.angel.uni.management.dto.GroupDTO;
+import com.angel.uni.management.dto.group.GroupRequestDTO;
+import com.angel.uni.management.dto.group.GroupResponseDTO;
 import com.angel.uni.management.service.UniversityGroupService;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,25 +23,25 @@ public class UniversityGroupController {
 
     @PostMapping
     @ResponseStatus(value = HttpStatus.CREATED)
-    public GroupDTO createGroup(@RequestBody GroupDTO groupDTO) throws BadRequestException {
-        return universityGroupService.createUniversityGroup(groupDTO);
+    public GroupRequestDTO createGroup(@RequestBody GroupRequestDTO requestDTO) throws BadRequestException {
+        return universityGroupService.createUniversityGroup(requestDTO);
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(value = HttpStatus.OK)
-    public GroupDTO getGroupById(@PathVariable("id") Long id) {
+    public GroupResponseDTO getGroupById(@PathVariable("id") Long id) {
         return universityGroupService.getUniversityGroupById(id);
     }
 
     @GetMapping
     @ResponseStatus(value = HttpStatus.OK)
-    public List<GroupDTO> getAllGroups() {
+    public List<GroupResponseDTO> getAllGroups() {
         return universityGroupService.getAllUniversityGroups();
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(value = HttpStatus.OK)
-    public GroupDTO updateGroupById(@PathVariable("id") Long id, @RequestBody GroupDTO groupDTO) throws BadRequestException {
-        return universityGroupService.updateUniversityGroup(id, groupDTO);
+    public GroupResponseDTO updateGroupById(@PathVariable("id") Long id, @RequestBody GroupResponseDTO groupResponseDTO) throws BadRequestException {
+        return universityGroupService.updateUniversityGroup(id, groupResponseDTO);
     }
 }

@@ -1,17 +1,17 @@
 package com.angel.uni.management.service.impl;
 
-import com.angel.uni.management.dto.GroupDTO;
+import com.angel.uni.management.dto.group.GroupRequestDTO;
+import com.angel.uni.management.dto.group.GroupResponseDTO;
 import com.angel.uni.management.entity.UniversityGroup;
 import com.angel.uni.management.exceptions.ResourceNotFoundException;
-import com.angel.uni.management.mapper.group.UniversityGroupDTOMapper;
-import com.angel.uni.management.mapper.group.UniversityGroupEntityMapper;
+import com.angel.uni.management.mapper.group.UniversityGroupMapper;
+import com.angel.uni.management.mapper.student.StudentMapper;
 import com.angel.uni.management.repositories.UniversityGroupRepository;
 import com.angel.uni.management.service.UniversityGroupService;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,56 +19,59 @@ import java.util.stream.Collectors;
 public class UniversityGroupServiceImpl implements UniversityGroupService {
 
     private final UniversityGroupRepository universityGroupRepository;
-    private final UniversityGroupDTOMapper universityGroupDTOMapper;
-    private final UniversityGroupEntityMapper universityGroupEntityMapper;
+    private final UniversityGroupMapper groupManager;
+    private final StudentMapper studentMapper;
 
     @Autowired
-    public UniversityGroupServiceImpl(UniversityGroupRepository universityGroupRepository, UniversityGroupDTOMapper universityGroupDTOMapper, UniversityGroupEntityMapper universityGroupEntityMapper) {
+    public UniversityGroupServiceImpl(UniversityGroupRepository universityGroupRepository,
+                                      UniversityGroupMapper groupManager,
+                                      StudentMapper studentMapper) {
         this.universityGroupRepository = universityGroupRepository;
-        this.universityGroupDTOMapper = universityGroupDTOMapper;
-        this.universityGroupEntityMapper = universityGroupEntityMapper;
+        this.groupManager = groupManager;
+        this.studentMapper = studentMapper;
     }
 
     @Override
-    public GroupDTO createUniversityGroup(GroupDTO groupDTO) throws BadRequestException {
-        if (groupDTO == null) {
-            throw new BadRequestException("Cannot create group: GroupDTO is null.");
+    public GroupRequestDTO createUniversityGroup(GroupRequestDTO requestDTO) throws BadRequestException {
+        if (requestDTO == null) {
+            throw new BadRequestException("Cannot create group: GroupResponseDTO is null.");
         }
 
-        UniversityGroup group = universityGroupEntityMapper.apply(groupDTO);
+        UniversityGroup group = groupManager.requestToEntity(requestDTO);
         UniversityGroup savedGroup = universityGroupRepository.save(group);
-        return universityGroupDTOMapper.apply(savedGroup);
+        return groupManager.toRequestDTO(savedGroup);
     }
 
     @Override
-    public GroupDTO getUniversityGroupById(Long id) {
+    public GroupResponseDTO getUniversityGroupById(Long id) {
         UniversityGroup getGroup = universityGroupRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("University group not found with this id: " + id));
-        return universityGroupDTOMapper.apply(getGroup);
+        return groupManager.toResponseDTO(getGroup);
     }
 
     @Override
-    public List<GroupDTO> getAllUniversityGroups() {
+    public List<GroupResponseDTO> getAllUniversityGroups() {
         List<UniversityGroup> results = universityGroupRepository.findAll();
 
         if (results.isEmpty()) {
             throw new ResourceNotFoundException("No universities groups not found.");
         }
 
-        return results.stream().map(universityGroupDTOMapper).collect(Collectors.toList());
+        return results.stream().map(groupManager::toResponseDTO).collect(Collectors.toList());
     }
 
     @Override
-    public GroupDTO updateUniversityGroup(Long id, GroupDTO groupDTO) throws BadRequestException {
+    public GroupResponseDTO updateUniversityGroup(Long id, GroupResponseDTO groupResponseDTO) throws BadRequestException {
 
-        if (groupDTO == null) {
-            throw new BadRequestException("Cannot update group: GroupDTO is null.");
+        if (groupResponseDTO == null) {
+            throw new BadRequestException("Cannot update group: GroupResponseDTO is null.");
         }
 
         UniversityGroup groupToBeEdited = universityGroupRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("University group not found with this id: " + id));
-        groupToBeEdited.setGroupName(groupDTO.groupName());
-        groupToBeEdited.setStudentsAssignedToGroup(groupToBeEdited.getStudentsAssignedToGroup());
+
+        groupToBeEdited.setGroupName(groupResponseDTO.groupName());
+        groupToBeEdited.setStudentsAssignedToGroup(groupResponseDTO.studentsAssignedToGroup().stream().map(studentMapper::responseToEntity).collect(Collectors.toList()));
         universityGroupRepository.save(groupToBeEdited);
 
-        return universityGroupDTOMapper.apply(groupToBeEdited);
+        return groupManager.toResponseDTO(groupToBeEdited);
     }
 }

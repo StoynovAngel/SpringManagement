@@ -1,11 +1,11 @@
 package com.angel.uni.management.service.impl;
 
-import com.angel.uni.management.dto.StudentDTO;
+import com.angel.uni.management.dto.student.StudentRequestDTO;
+import com.angel.uni.management.dto.student.StudentResponseDTO;
 import com.angel.uni.management.entity.Student;
 import com.angel.uni.management.exceptions.ResourceNotFoundException;
 import com.angel.uni.management.mapper.grade.GradeEntityMapper;
-import com.angel.uni.management.mapper.student.StudentDTOMapper;
-import com.angel.uni.management.mapper.student.StudentEntityMapper;
+import com.angel.uni.management.mapper.student.StudentMapper;
 import com.angel.uni.management.repositories.StudentRepository;
 import com.angel.uni.management.service.StudentService;
 import org.apache.coyote.BadRequestException;
@@ -19,67 +19,65 @@ import java.util.stream.Collectors;
 @Service
 public class StudentServiceImpl implements StudentService {
 
-    private final StudentDTOMapper studentDTOMapper;
-    private final StudentEntityMapper studentEntityMapper;
     private final GradeEntityMapper gradeEntityMapper;
     private final StudentRepository studentRepository;
+    private final StudentMapper studentMapper;
 
     @Autowired
-    public StudentServiceImpl(StudentDTOMapper studentDTOMapper, StudentEntityMapper studentEntityMapper, GradeEntityMapper gradeEntityMapper, StudentRepository studentRepository) {
-        this.studentDTOMapper = studentDTOMapper;
-        this.studentEntityMapper = studentEntityMapper;
+    public StudentServiceImpl(GradeEntityMapper gradeEntityMapper, StudentRepository studentRepository, StudentMapper studentMapper) {
         this.gradeEntityMapper = gradeEntityMapper;
         this.studentRepository = studentRepository;
+        this.studentMapper = studentMapper;
     }
 
     @Override
-    public StudentDTO createStudent(StudentDTO studentDTO) throws BadRequestException {
-        if (studentDTO == null) {
-            throw new BadRequestException("Cannot create student: Provided StudentDTO is null");
+    public StudentRequestDTO createStudent(StudentRequestDTO studentRequestDTO) throws BadRequestException {
+        if (studentRequestDTO == null) {
+            throw new BadRequestException("Cannot create student: Provided StudentRequestDTO is null");
         }
-        Student student = studentEntityMapper.apply(studentDTO);
+        Student student = studentMapper.requestToEntity(studentRequestDTO);
         Student savedStudent = studentRepository.save(student);
-        return studentDTOMapper.apply(savedStudent);
+        return studentMapper.toRequestDTO(savedStudent);
     }
 
     @Override
-    public StudentDTO getStudentById(Long id) {
+    public StudentResponseDTO getStudentById(Long id) {
         Student student = studentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Student not found with this id: " + id));
-        return studentDTOMapper.apply(student);
+        return studentMapper.toResponseDTO(student);
     }
 
     @Override
-    public List<StudentDTO> getAllStudents() {
+    public List<StudentResponseDTO> getAllStudents() {
         List<Student> students = studentRepository.findAll();
         if (students.isEmpty()) {
             throw new ResourceNotFoundException("Students' list cannot be empty.");
         }
-        return students.stream().map(studentDTOMapper).collect(Collectors.toList());
+        return students.stream().map(studentMapper::toResponseDTO).collect(Collectors.toList());
     }
 
     @Override
-    public StudentDTO updateStudent(Long id, StudentDTO updateStudentDTO) throws BadRequestException {
-        if (updateStudentDTO == null) {
-            throw new BadRequestException("Cannot update student: Provided StudentDTO is null");
+    public StudentResponseDTO updateStudent(Long id, StudentResponseDTO updateStudentResponseDTO) throws BadRequestException {
+        if (updateStudentResponseDTO == null) {
+            throw new BadRequestException("Cannot update student: Provided StudentResponseDTO is null");
         }
 
         Student student = studentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Student not found with this id: " + id));
-        Student newStudent = updateStudentFields(student, updateStudentDTO);
-        return studentDTOMapper.apply(newStudent);
+        Student newStudent = updateStudentFields(student, updateStudentResponseDTO);
+        return studentMapper.toResponseDTO(newStudent);
     }
 
-    private Student updateStudentFields(Student studentEntity, StudentDTO updateStudentDTO) {
+    private Student updateStudentFields(Student studentEntity, StudentResponseDTO updateStudentResponseDTO) {
 
-        if (updateStudentDTO.grades() == null) {
+        if (updateStudentResponseDTO.grades() == null) {
             studentEntity.setGrades(new ArrayList<>());
         } else {
-            studentEntity.setGrades(updateStudentDTO.grades().stream()
+            studentEntity.setGrades(updateStudentResponseDTO.grades().stream()
                     .map(gradeEntityMapper)
                     .collect(Collectors.toList()));
         }
 
-        studentEntity.setUsername(updateStudentDTO.username());
-        studentEntity.setAverageGradeOverall(updateStudentDTO.averageGradeOverall());
+        studentEntity.setUsername(updateStudentResponseDTO.username());
+        studentEntity.setAverageGradeOverall(updateStudentResponseDTO.averageGradeOverall());
         return studentRepository.save(studentEntity);
     }
 }

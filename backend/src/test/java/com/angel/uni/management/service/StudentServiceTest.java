@@ -1,23 +1,23 @@
 package com.angel.uni.management.service;
 
-import com.angel.uni.management.dto.StudentDTO;
+import com.angel.uni.management.dto.student.StudentRequestDTO;
+import com.angel.uni.management.dto.student.StudentResponseDTO;
 import com.angel.uni.management.entity.Student;
 import com.angel.uni.management.exceptions.ResourceNotFoundException;
 import com.angel.uni.management.mapper.grade.GradeEntityMapper;
-import com.angel.uni.management.mapper.student.StudentDTOMapper;
-import com.angel.uni.management.mapper.student.StudentEntityMapper;
+import com.angel.uni.management.mapper.student.StudentMapper;
 import com.angel.uni.management.repositories.StudentRepository;
 import com.angel.uni.management.service.impl.StudentServiceImpl;
 import org.apache.coyote.BadRequestException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Answers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,11 +27,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class StudentServiceTest {
 
-    @Mock
-    private StudentDTOMapper studentDTOMapper;
-
-    @Mock
-    private StudentEntityMapper studentEntityMapper;
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    private StudentMapper studentMapper;
 
     @Mock
     private StudentRepository studentRepository;
@@ -43,7 +40,9 @@ class StudentServiceTest {
     private GradeEntityMapper gradeEntityMapper;
 
     private Student student;
-    private StudentDTO studentDTO;
+    private StudentResponseDTO studentResponseDTO;
+    private StudentRequestDTO studentRequestDTO;
+
 
     @BeforeEach
     void setUp() {
@@ -51,21 +50,21 @@ class StudentServiceTest {
         student.setUsername("ivan123");
         student.setAverageGradeOverall(5.50);
 
-        studentDTO = new StudentDTO(1L, "ivan123", List.of(), 5.50);
+        studentResponseDTO = new StudentResponseDTO(1L, "ivan123", List.of(), 5.50);
+        studentRequestDTO = new StudentRequestDTO("ivan123", List.of());
         gradeEntityMapper = new GradeEntityMapper();
     }
 
     @Test
     void testCreateStudent() throws BadRequestException {
-        when(studentEntityMapper.apply(studentDTO)).thenReturn(student);
+        when(studentMapper.requestToEntity(studentRequestDTO)).thenReturn(student);
         when(studentRepository.save(student)).thenReturn(student);
-        when(studentDTOMapper.apply(student)).thenReturn(studentDTO);
+        when(studentMapper.toRequestDTO(student)).thenReturn(studentRequestDTO);
 
-        StudentDTO saved = studentService.createStudent(studentDTO);
+        StudentRequestDTO saved = studentService.createStudent(studentRequestDTO);
 
         assertNotNull(saved);
         assertEquals("ivan123", saved.username());
-        assertEquals(5.50, saved.averageGradeOverall());
     }
 
     @Test
@@ -78,8 +77,8 @@ class StudentServiceTest {
     @Test
     void testGetStudentById() {
         when(studentRepository.findById(1L)).thenReturn(Optional.of(student));
-        when(studentDTOMapper.apply(student)).thenReturn(studentDTO);
-        StudentDTO receivedStudent = studentService.getStudentById(1L);
+        when(studentMapper.toResponseDTO(student)).thenReturn(studentResponseDTO);
+        StudentResponseDTO receivedStudent = studentService.getStudentById(1L);
         assertNotNull(receivedStudent);
     }
 
@@ -87,13 +86,13 @@ class StudentServiceTest {
     @Test
     void testGetAllStudents() {
         Student student = Student.builder().id(1L).username("angel").build();
-        StudentDTO studentDTO = StudentDTO.builder().id(1L).username("angel").grades(List.of()).averageGradeOverall(0.0).build();
+        StudentResponseDTO studentResponseDTO = StudentResponseDTO.builder().id(1L).username("angel").grades(List.of()).averageGradeOverall(0.0).build();
         List<Student> studentList = List.of(student);
 
         when(studentRepository.findAll()).thenReturn(studentList);
-        when(studentDTOMapper.apply(student)).thenReturn(studentDTO);
+        when(studentMapper.toResponseDTO(student)).thenReturn(studentResponseDTO);
 
-        List<StudentDTO> result = studentService.getAllStudents();
+        List<StudentResponseDTO> result = studentService.getAllStudents();
 
         assertNotNull(result);
         assertFalse(result.isEmpty());
@@ -110,14 +109,14 @@ class StudentServiceTest {
     void testUpdateStudent() throws BadRequestException {
         Long studentId = 1L;
         Student updatedStudent = Student.builder().username("updated_username").averageGradeOverall(6.00).build();
-        StudentDTO updatedDTO = StudentDTO.builder()
+        StudentResponseDTO updatedDTO = StudentResponseDTO.builder()
                 .id(studentId).username("updated_username").grades(List.of()).averageGradeOverall(6.00).build();
 
         when(studentRepository.findById(studentId)).thenReturn(Optional.of(student));
         when(studentRepository.save(Mockito.any(Student.class))).thenReturn(updatedStudent);
-        when(studentDTOMapper.apply(updatedStudent)).thenReturn(updatedDTO);
+        when(studentMapper.toResponseDTO(updatedStudent)).thenReturn(updatedDTO);
 
-        StudentDTO result = studentService.updateStudent(studentId, updatedDTO);
+        StudentResponseDTO result = studentService.updateStudent(studentId, updatedDTO);
 
         assertNotNull(result);
         assertEquals("updated_username", result.username());

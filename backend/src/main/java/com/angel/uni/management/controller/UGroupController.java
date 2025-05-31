@@ -1,7 +1,7 @@
 package com.angel.uni.management.controller;
 
 import com.angel.uni.management.dto.GroupDTO;
-import com.angel.uni.management.service.UniversityGroupService;
+import com.angel.uni.management.service.UGroupService;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,12 +11,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/group")
-public class UniversityGroupController {
+public class UGroupController {
 
-    private final UniversityGroupService universityGroupService;
+    private final UGroupService universityGroupService;
 
     @Autowired
-    public UniversityGroupController(UniversityGroupService universityGroupService) {
+    public UGroupController(UGroupService universityGroupService) {
         this.universityGroupService = universityGroupService;
     }
 

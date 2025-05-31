@@ -3,8 +3,7 @@ package com.angel.uni.management.service.impl;
 import com.angel.uni.management.dto.TeacherDTO;
 import com.angel.uni.management.entity.Teacher;
 import com.angel.uni.management.exceptions.ResourceNotFoundException;
-import com.angel.uni.management.mapper.teacher.TeacherDTOMapper;
-import com.angel.uni.management.mapper.teacher.TeacherEntityMapper;
+import com.angel.uni.management.mapper.teacher.TeacherMapper;
 import com.angel.uni.management.repositories.TeacherRepository;
 import com.angel.uni.management.service.TeacherService;
 import org.apache.coyote.BadRequestException;
@@ -18,14 +17,12 @@ import java.util.stream.Collectors;
 public class TeacherServiceImpl implements TeacherService {
 
     private final TeacherRepository repository;
-    private final TeacherEntityMapper teacherEntityMapper;
-    private final TeacherDTOMapper teacherDTOMapper;
+    private final TeacherMapper teacherMapper;
 
     @Autowired
-    public TeacherServiceImpl(TeacherRepository repository, TeacherEntityMapper teacherEntityMapper, TeacherDTOMapper teacherDTOMapper) {
+    public TeacherServiceImpl(TeacherRepository repository, TeacherMapper teacherMapper) {
         this.repository = repository;
-        this.teacherEntityMapper = teacherEntityMapper;
-        this.teacherDTOMapper = teacherDTOMapper;
+        this.teacherMapper = teacherMapper;
     }
 
     @Override
@@ -34,15 +31,15 @@ public class TeacherServiceImpl implements TeacherService {
             throw new BadRequestException("Cannot create teacher: Provided TeacherDTO is null");
         }
 
-        Teacher teacher = teacherEntityMapper.apply(teacherDTO);
+        Teacher teacher = teacherMapper.toEntity(teacherDTO);
         Teacher saved = repository.save(teacher);
-        return teacherDTOMapper.apply(saved);
+        return teacherMapper.toDTO(saved);
     }
 
     @Override
     public TeacherDTO getTeacherById(Long id) {
         Teacher teacher = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Teacher not found with this id:" + id));
-        return teacherDTOMapper.apply(teacher);
+        return teacherMapper.toDTO(teacher);
     }
 
     @Override
@@ -53,7 +50,7 @@ public class TeacherServiceImpl implements TeacherService {
             throw new ResourceNotFoundException("Could not get all teachers. Teachers' list is empty.");
         }
 
-        return teachers.stream().map(teacherDTOMapper).collect(Collectors.toList());
+        return teachers.stream().map(teacherMapper::toDTO).collect(Collectors.toList());
     }
 
     @Override
@@ -65,7 +62,7 @@ public class TeacherServiceImpl implements TeacherService {
 
         Teacher teacher = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Teacher not found with this id: " + id));
         Teacher updatedTeacher = updateTeacherFields(teacherDTO, teacher);
-        return teacherDTOMapper.apply(updatedTeacher);
+        return teacherMapper.toDTO(updatedTeacher);
     }
 
     private Teacher updateTeacherFields(TeacherDTO teacherDTO, Teacher teacher) {

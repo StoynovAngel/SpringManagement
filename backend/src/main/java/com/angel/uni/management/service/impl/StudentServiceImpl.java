@@ -3,9 +3,8 @@ package com.angel.uni.management.service.impl;
 import com.angel.uni.management.dto.StudentDTO;
 import com.angel.uni.management.entity.Student;
 import com.angel.uni.management.exceptions.ResourceNotFoundException;
-import com.angel.uni.management.mapper.grade.GradeEntityMapper;
-import com.angel.uni.management.mapper.student.StudentDTOMapper;
-import com.angel.uni.management.mapper.student.StudentEntityMapper;
+import com.angel.uni.management.mapper.grade.GradeMapper;
+import com.angel.uni.management.mapper.student.StudentMapper;
 import com.angel.uni.management.repositories.StudentRepository;
 import com.angel.uni.management.service.StudentService;
 import org.apache.coyote.BadRequestException;
@@ -19,16 +18,14 @@ import java.util.stream.Collectors;
 @Service
 public class StudentServiceImpl implements StudentService {
 
-    private final StudentDTOMapper studentDTOMapper;
-    private final StudentEntityMapper studentEntityMapper;
-    private final GradeEntityMapper gradeEntityMapper;
+    private final StudentMapper studentMapper;
+    private final GradeMapper gradeMapper;
     private final StudentRepository studentRepository;
 
     @Autowired
-    public StudentServiceImpl(StudentDTOMapper studentDTOMapper, StudentEntityMapper studentEntityMapper, GradeEntityMapper gradeEntityMapper, StudentRepository studentRepository) {
-        this.studentDTOMapper = studentDTOMapper;
-        this.studentEntityMapper = studentEntityMapper;
-        this.gradeEntityMapper = gradeEntityMapper;
+    public StudentServiceImpl(StudentMapper studentMapper,GradeMapper gradeMapper, StudentRepository studentRepository) {
+        this.studentMapper = studentMapper;
+        this.gradeMapper = gradeMapper;
         this.studentRepository = studentRepository;
     }
 
@@ -37,15 +34,15 @@ public class StudentServiceImpl implements StudentService {
         if (studentDTO == null) {
             throw new BadRequestException("Cannot create student: Provided StudentDTO is null");
         }
-        Student student = studentEntityMapper.apply(studentDTO);
+        Student student = studentMapper.toEntity(studentDTO);
         Student savedStudent = studentRepository.save(student);
-        return studentDTOMapper.apply(savedStudent);
+        return studentMapper.toDTO(savedStudent);
     }
 
     @Override
     public StudentDTO getStudentById(Long id) {
         Student student = studentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Student not found with this id: " + id));
-        return studentDTOMapper.apply(student);
+        return studentMapper.toDTO(student);
     }
 
     @Override
@@ -54,7 +51,7 @@ public class StudentServiceImpl implements StudentService {
         if (students.isEmpty()) {
             throw new ResourceNotFoundException("Students' list cannot be empty.");
         }
-        return students.stream().map(studentDTOMapper).collect(Collectors.toList());
+        return students.stream().map(studentMapper::toDTO).collect(Collectors.toList());
     }
 
     @Override
@@ -65,7 +62,7 @@ public class StudentServiceImpl implements StudentService {
 
         Student student = studentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Student not found with this id: " + id));
         Student newStudent = updateStudentFields(student, updateStudentDTO);
-        return studentDTOMapper.apply(newStudent);
+        return studentMapper.toDTO(newStudent);
     }
 
     private Student updateStudentFields(Student studentEntity, StudentDTO updateStudentDTO) {
@@ -74,7 +71,7 @@ public class StudentServiceImpl implements StudentService {
             studentEntity.setGrades(new ArrayList<>());
         } else {
             studentEntity.setGrades(updateStudentDTO.grades().stream()
-                    .map(gradeEntityMapper)
+                    .map(gradeMapper::toEntity)
                     .collect(Collectors.toList()));
         }
 

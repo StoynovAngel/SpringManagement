@@ -5,7 +5,7 @@ import org.apache.coyote.BadRequestException;
 
 import java.util.List;
 
-public interface UniversityGroupService {
+public interface UGroupService {
     GroupDTO createUniversityGroup(GroupDTO groupDTO) throws BadRequestException;
     GroupDTO getUniversityGroupById(Long id);
     List<GroupDTO> getAllUniversityGroups();

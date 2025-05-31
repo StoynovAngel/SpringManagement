@@ -30,7 +30,6 @@ public class SwaggerConfig {
                                         .scheme("bearer")
                                         .bearerFormat("JWT")))
                 .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
-                .info(new Info().title("University Management" +
-                        "").version("1.0.0"));
+                .info(new Info().title("University Management").version("1.0.0"));
     }
 }

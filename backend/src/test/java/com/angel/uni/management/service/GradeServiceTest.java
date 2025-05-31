@@ -6,9 +6,8 @@ import com.angel.uni.management.entity.Teacher;
 import com.angel.uni.management.enums.CountryEnum;
 import com.angel.uni.management.enums.GradeType;
 import com.angel.uni.management.exceptions.ResourceNotFoundException;
-import com.angel.uni.management.mapper.grade.GradeDTOMapper;
-import com.angel.uni.management.mapper.grade.GradeEntityMapper;
-import com.angel.uni.management.mapper.teacher.TeacherEntityMapper;
+import com.angel.uni.management.mapper.grade.GradeMapper;
+import com.angel.uni.management.mapper.teacher.TeacherMapper;
 import com.angel.uni.management.repositories.GradeRepository;
 import com.angel.uni.management.repositories.TeacherRepository;
 import com.angel.uni.management.service.impl.GradeServiceImpl;
@@ -39,16 +38,13 @@ class GradeServiceTest {
     private GradeServiceImpl gradeService;
 
     @Mock
-    private GradeDTOMapper gradeDTOMapper;
-
-    @Mock
     private TeacherRepository teacherRepository;
 
     @Mock
-    private GradeEntityMapper gradeEntityMapper;
+    private GradeMapper gradeMapper;
 
     @Mock
-    private TeacherEntityMapper teacherEntityMapper;
+    private TeacherMapper teacherMapper;
 
     private GradeDTO gradeDTO;
     private Grade grade;
@@ -64,7 +60,7 @@ class GradeServiceTest {
                 .gradeType(GradeType.FINAL)
                 .mark(5.0)
                 .dateOfGrading(LocalDateTime.now())
-                .countryEnum(CountryEnum.BG)
+                .countryRepresentation(CountryEnum.BG)
                 .build();
 
         grade = Grade.builder()
@@ -77,15 +73,14 @@ class GradeServiceTest {
                 .countryRepresentation(CountryEnum.BG)
                 .build();
 
-        teacherEntityMapper = new TeacherEntityMapper();
     }
 
     @Test
     void testCreateGrade() throws BadRequestException {
         Mockito.when(teacherRepository.findById(1L)).thenReturn(Optional.of(teacher));
-        Mockito.when(gradeEntityMapper.apply(gradeDTO)).thenReturn(grade);
+        Mockito.when(gradeMapper.toEntity(gradeDTO)).thenReturn(grade);
         Mockito.when(gradeRepository.save(grade)).thenReturn(grade);
-        Mockito.when(gradeDTOMapper.apply(grade)).thenReturn(gradeDTO);
+        Mockito.when(gradeMapper.toDTO(grade)).thenReturn(gradeDTO);
 
         GradeDTO result = gradeService.createGrade(gradeDTO);
         assertNotNull(result);
@@ -102,7 +97,7 @@ class GradeServiceTest {
     @Test
     void testGetGradeById() {
         Mockito.when(gradeRepository.findById(1L)).thenReturn(Optional.of(grade));
-        Mockito.when(gradeDTOMapper.apply(grade)).thenReturn(gradeDTO);
+        Mockito.when(gradeMapper.toDTO(grade)).thenReturn(gradeDTO);
         GradeDTO result = gradeService.getGradeById(1L);
         assertEquals("grade", result.name());
     }
@@ -119,7 +114,7 @@ class GradeServiceTest {
         List<Grade> gradesList = new ArrayList<>();
         gradesList.add(grade);
         Mockito.when(gradeRepository.findAll()).thenReturn(gradesList);
-        Mockito.when(gradeDTOMapper.apply(grade)).thenReturn(gradeDTO);
+        Mockito.when(gradeMapper.toDTO(grade)).thenReturn(gradeDTO);
 
         List<GradeDTO> results = gradeService.getAllGrades();
         assertNotNull(results);
@@ -141,13 +136,13 @@ class GradeServiceTest {
                 .gradeType(GradeType.ORAL)
                 .mark(4.25)
                 .dateOfGrading(LocalDateTime.now())
-                .countryEnum(CountryEnum.DE)
+                .countryRepresentation(CountryEnum.DE)
                 .build();
 
         Mockito.when(gradeRepository.findById(1L)).thenReturn(Optional.of(grade));
         Mockito.when(teacherRepository.findById(updatedGradeDTO.teacherId())).thenReturn(Optional.of(teacher));
         Mockito.when(gradeRepository.save(Mockito.any(Grade.class))).thenReturn(grade);
-        Mockito.when(gradeDTOMapper.apply(Mockito.any(Grade.class))).thenReturn(updatedGradeDTO);
+        Mockito.when(gradeMapper.toDTO(Mockito.any(Grade.class))).thenReturn(updatedGradeDTO);
 
         GradeDTO result = gradeService.updateGrade(1L, updatedGradeDTO);
 

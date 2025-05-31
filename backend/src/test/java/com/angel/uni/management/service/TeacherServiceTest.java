@@ -3,8 +3,7 @@ package com.angel.uni.management.service;
 import com.angel.uni.management.dto.TeacherDTO;
 import com.angel.uni.management.entity.Teacher;
 import com.angel.uni.management.exceptions.ResourceNotFoundException;
-import com.angel.uni.management.mapper.teacher.TeacherDTOMapper;
-import com.angel.uni.management.mapper.teacher.TeacherEntityMapper;
+import com.angel.uni.management.mapper.teacher.TeacherMapper;
 import com.angel.uni.management.repositories.TeacherRepository;
 import com.angel.uni.management.service.impl.TeacherServiceImpl;
 import org.apache.coyote.BadRequestException;
@@ -26,10 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class TeacherServiceTest {
 
     @Mock
-    private TeacherDTOMapper teacherDTOMapper;
-
-    @Mock
-    private TeacherEntityMapper teacherEntityMapper;
+    private TeacherMapper teacherMapper;
 
     @InjectMocks
     private TeacherServiceImpl teacherService;
@@ -48,9 +44,9 @@ class TeacherServiceTest {
 
     @Test
     void testCreateTeacher() throws BadRequestException {
-        Mockito.when(teacherEntityMapper.apply(teacherDTO)).thenReturn(teacher);
+        Mockito.when(teacherMapper.toEntity(teacherDTO)).thenReturn(teacher);
         Mockito.when(teacherRepository.save(teacher)).thenReturn(teacher);
-        Mockito.when(teacherDTOMapper.apply(teacher)).thenReturn(teacherDTO);
+        Mockito.when(teacherMapper.toDTO(teacher)).thenReturn(teacherDTO);
 
         TeacherDTO saved = teacherService.createTeacher(teacherDTO);
         assertNotNull(saved);
@@ -66,7 +62,7 @@ class TeacherServiceTest {
     @Test
     void testGetTeacherById() {
         Mockito.when(teacherRepository.findById(1L)).thenReturn(Optional.of(teacher));
-        Mockito.when(teacherDTOMapper.apply(teacher)).thenReturn(teacherDTO);
+        Mockito.when(teacherMapper.toDTO(teacher)).thenReturn(teacherDTO);
         TeacherDTO receivedTeacher = teacherService.getTeacherById(1L);
         assertNotNull(receivedTeacher);
     }
@@ -75,7 +71,7 @@ class TeacherServiceTest {
     void testGetAllTeachers() {
         List<Teacher> teachers = List.of(teacher);
         Mockito.when(teacherRepository.findAll()).thenReturn(teachers);
-        Mockito.when(teacherDTOMapper.apply(teacher)).thenReturn(teacherDTO);
+        Mockito.when(teacherMapper.toDTO(teacher)).thenReturn(teacherDTO);
 
         List<TeacherDTO> results = teacherService.getAllTeachers();
         assertNotNull(results);
@@ -97,7 +93,7 @@ class TeacherServiceTest {
 
         Mockito.when(teacherRepository.findById(teacherId)).thenReturn(Optional.of(teacher));
         Mockito.when(teacherRepository.save(Mockito.any(Teacher.class))).thenReturn(updateTeacher);
-        Mockito.when(teacherDTOMapper.apply(updateTeacher)).thenReturn(updateTeacherDTO);
+        Mockito.when(teacherMapper.toDTO(updateTeacher)).thenReturn(updateTeacherDTO);
 
         TeacherDTO result = teacherService.updateTeacher(teacherId, updateTeacherDTO);
         assertNotNull(result);

@@ -5,5 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface UniversitySubjectRepository extends JpaRepository<UniversitySubject, Long> {
+public interface USubjectRepository extends JpaRepository<UniversitySubject, Long> {
+
+    UniversitySubject findByName(String name);
 }

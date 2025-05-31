@@ -1,11 +1,15 @@
 package com.angel.uni.management.service;
 
+import com.angel.uni.management.dto.GradeDTO;
 import com.angel.uni.management.dto.StudentDTO;
+import com.angel.uni.management.entity.Grade;
 import com.angel.uni.management.entity.Student;
+import com.angel.uni.management.entity.Teacher;
+import com.angel.uni.management.enums.CountryEnum;
+import com.angel.uni.management.enums.GradeType;
 import com.angel.uni.management.exceptions.ResourceNotFoundException;
-import com.angel.uni.management.mapper.grade.GradeEntityMapper;
-import com.angel.uni.management.mapper.student.StudentDTOMapper;
-import com.angel.uni.management.mapper.student.StudentEntityMapper;
+import com.angel.uni.management.mapper.grade.GradeMapper;
+import com.angel.uni.management.mapper.student.StudentMapper;
 import com.angel.uni.management.repositories.StudentRepository;
 import com.angel.uni.management.service.impl.StudentServiceImpl;
 import org.apache.coyote.BadRequestException;
@@ -17,7 +21,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,10 +32,10 @@ import static org.mockito.Mockito.when;
 class StudentServiceTest {
 
     @Mock
-    private StudentDTOMapper studentDTOMapper;
+    private StudentMapper studentMapper;
 
     @Mock
-    private StudentEntityMapper studentEntityMapper;
+    private GradeMapper gradeMapper;
 
     @Mock
     private StudentRepository studentRepository;
@@ -39,11 +43,10 @@ class StudentServiceTest {
     @InjectMocks
     private StudentServiceImpl studentService;
 
-    @Mock
-    private GradeEntityMapper gradeEntityMapper;
-
     private Student student;
     private StudentDTO studentDTO;
+    private GradeDTO gradeDTO;
+    private Grade grade;
 
     @BeforeEach
     void setUp() {
@@ -52,14 +55,33 @@ class StudentServiceTest {
         student.setAverageGradeOverall(5.50);
 
         studentDTO = new StudentDTO(1L, "ivan123", List.of(), 5.50);
-        gradeEntityMapper = new GradeEntityMapper();
+
+        gradeDTO = GradeDTO.builder()
+                .id(1L)
+                .name("grade")
+                .teacherId(1L)
+                .gradeType(GradeType.FINAL)
+                .mark(5.0)
+                .dateOfGrading(LocalDateTime.now())
+                .countryRepresentation(CountryEnum.BG)
+                .build();
+
+        grade = Grade.builder()
+                .id(1L)
+                .name("grade")
+                .teacher(new Teacher(1L, "ivan"))
+                .gradeType(GradeType.FINAL)
+                .mark(5.0)
+                .dateOfGrading(LocalDateTime.now())
+                .countryRepresentation(CountryEnum.BG)
+                .build();
     }
 
     @Test
     void testCreateStudent() throws BadRequestException {
-        when(studentEntityMapper.apply(studentDTO)).thenReturn(student);
+        when(studentMapper.toEntity(studentDTO)).thenReturn(student);
         when(studentRepository.save(student)).thenReturn(student);
-        when(studentDTOMapper.apply(student)).thenReturn(studentDTO);
+        when(studentMapper.toDTO(student)).thenReturn(studentDTO);
 
         StudentDTO saved = studentService.createStudent(studentDTO);
 
@@ -78,7 +100,7 @@ class StudentServiceTest {
     @Test
     void testGetStudentById() {
         when(studentRepository.findById(1L)).thenReturn(Optional.of(student));
-        when(studentDTOMapper.apply(student)).thenReturn(studentDTO);
+        when(studentMapper.toDTO(student)).thenReturn(studentDTO);
         StudentDTO receivedStudent = studentService.getStudentById(1L);
         assertNotNull(receivedStudent);
     }
@@ -91,7 +113,7 @@ class StudentServiceTest {
         List<Student> studentList = List.of(student);
 
         when(studentRepository.findAll()).thenReturn(studentList);
-        when(studentDTOMapper.apply(student)).thenReturn(studentDTO);
+        when(studentMapper.toDTO(student)).thenReturn(studentDTO);
 
         List<StudentDTO> result = studentService.getAllStudents();
 
@@ -109,19 +131,27 @@ class StudentServiceTest {
     @Test
     void testUpdateStudent() throws BadRequestException {
         Long studentId = 1L;
-        Student updatedStudent = Student.builder().username("updated_username").averageGradeOverall(6.00).build();
+
+        Student updatedStudent = Student.builder()
+                .username("updated_username")
+                .grades(List.of(grade))
+                .averageGradeOverall(6.00).build();
+
         StudentDTO updatedDTO = StudentDTO.builder()
-                .id(studentId).username("updated_username").grades(List.of()).averageGradeOverall(6.00).build();
+                .id(studentId)
+                .username("updated_username")
+                .grades(List.of(gradeDTO))
+                .averageGradeOverall(4.00).build();
 
         when(studentRepository.findById(studentId)).thenReturn(Optional.of(student));
         when(studentRepository.save(Mockito.any(Student.class))).thenReturn(updatedStudent);
-        when(studentDTOMapper.apply(updatedStudent)).thenReturn(updatedDTO);
+        when(studentMapper.toDTO(updatedStudent)).thenReturn(updatedDTO);
 
         StudentDTO result = studentService.updateStudent(studentId, updatedDTO);
 
         assertNotNull(result);
         assertEquals("updated_username", result.username());
-        assertEquals(6.00, result.averageGradeOverall());
+        assertEquals(4.00, result.averageGradeOverall());
     }
 
     @Test

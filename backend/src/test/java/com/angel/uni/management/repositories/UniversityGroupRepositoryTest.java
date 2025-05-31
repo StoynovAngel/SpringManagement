@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class UniversityGroupRepositoryTest {
 
     @Autowired
-    private UniversityGroupRepository universityGroupRepository;
+    private UGroupRepository universityGroupRepository;
 
     @Autowired
     private TestData testData;

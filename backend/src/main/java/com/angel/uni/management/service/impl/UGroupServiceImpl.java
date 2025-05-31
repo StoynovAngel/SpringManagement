@@ -3,30 +3,26 @@ package com.angel.uni.management.service.impl;
 import com.angel.uni.management.dto.GroupDTO;
 import com.angel.uni.management.entity.UniversityGroup;
 import com.angel.uni.management.exceptions.ResourceNotFoundException;
-import com.angel.uni.management.mapper.group.UniversityGroupDTOMapper;
-import com.angel.uni.management.mapper.group.UniversityGroupEntityMapper;
-import com.angel.uni.management.repositories.UniversityGroupRepository;
-import com.angel.uni.management.service.UniversityGroupService;
+import com.angel.uni.management.mapper.group.GroupMapper;
+import com.angel.uni.management.repositories.UGroupRepository;
+import com.angel.uni.management.service.UGroupService;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class UniversityGroupServiceImpl implements UniversityGroupService {
+public class UGroupServiceImpl implements UGroupService {
 
-    private final UniversityGroupRepository universityGroupRepository;
-    private final UniversityGroupDTOMapper universityGroupDTOMapper;
-    private final UniversityGroupEntityMapper universityGroupEntityMapper;
+    private final UGroupRepository universityGroupRepository;
+    private final GroupMapper groupMapper;
 
     @Autowired
-    public UniversityGroupServiceImpl(UniversityGroupRepository universityGroupRepository, UniversityGroupDTOMapper universityGroupDTOMapper, UniversityGroupEntityMapper universityGroupEntityMapper) {
+    public UGroupServiceImpl(UGroupRepository universityGroupRepository, GroupMapper groupMapper) {
         this.universityGroupRepository = universityGroupRepository;
-        this.universityGroupDTOMapper = universityGroupDTOMapper;
-        this.universityGroupEntityMapper = universityGroupEntityMapper;
+        this.groupMapper = groupMapper;
     }
 
     @Override
@@ -35,15 +31,15 @@ public class UniversityGroupServiceImpl implements UniversityGroupService {
             throw new BadRequestException("Cannot create group: GroupDTO is null.");
         }
 
-        UniversityGroup group = universityGroupEntityMapper.apply(groupDTO);
+        UniversityGroup group = groupMapper.toEntity(groupDTO);
         UniversityGroup savedGroup = universityGroupRepository.save(group);
-        return universityGroupDTOMapper.apply(savedGroup);
+        return groupMapper.toDTO(savedGroup);
     }
 
     @Override
     public GroupDTO getUniversityGroupById(Long id) {
         UniversityGroup getGroup = universityGroupRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("University group not found with this id: " + id));
-        return universityGroupDTOMapper.apply(getGroup);
+        return groupMapper.toDTO(getGroup);
     }
 
     @Override
@@ -54,7 +50,7 @@ public class UniversityGroupServiceImpl implements UniversityGroupService {
             throw new ResourceNotFoundException("No universities groups not found.");
         }
 
-        return results.stream().map(universityGroupDTOMapper).collect(Collectors.toList());
+        return results.stream().map(groupMapper::toDTO).collect(Collectors.toList());
     }
 
     @Override
@@ -69,6 +65,6 @@ public class UniversityGroupServiceImpl implements UniversityGroupService {
         groupToBeEdited.setStudentsAssignedToGroup(groupToBeEdited.getStudentsAssignedToGroup());
         universityGroupRepository.save(groupToBeEdited);
 
-        return universityGroupDTOMapper.apply(groupToBeEdited);
+        return groupMapper.toDTO(groupToBeEdited);
     }
 }

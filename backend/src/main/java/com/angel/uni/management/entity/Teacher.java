@@ -5,8 +5,7 @@ import lombok.*;
 
 @Entity
 @Table(name = "teacher")
-@Getter
-@Setter
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,5 +19,4 @@ public class Teacher  {
 
     @Column(name = "name", nullable = false, unique = true)
     private String name;
-
 }

@@ -54,7 +54,7 @@ class GradeControllerTest {
                 .gradeType(GradeType.FINAL)
                 .mark(4.25)
                 .dateOfGrading(LocalDateTime.now())
-                .countryEnum(CountryEnum.DE)
+                .countryRepresentation(CountryEnum.DE)
                 .build();
     }
 
@@ -105,7 +105,7 @@ class GradeControllerTest {
                 .gradeType(GradeType.ORAL)
                 .mark(4.50)
                 .dateOfGrading(LocalDateTime.now())
-                .countryEnum(CountryEnum.BG)
+                .countryRepresentation(CountryEnum.BG)
                 .build();
 
         Mockito.when(gradeService.updateGrade(id, updatedDTO)).thenReturn(updatedDTO);

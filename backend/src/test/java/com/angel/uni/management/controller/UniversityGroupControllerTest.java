@@ -1,7 +1,7 @@
 package com.angel.uni.management.controller;
 
-import com.angel.uni.management.dto.group.GroupResponseDTO;
-import com.angel.uni.management.service.UniversityGroupService;
+import com.angel.uni.management.dto.GroupDTO;
+import com.angel.uni.management.service.UGroupService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,17 +25,17 @@ import java.util.List;
 
 import static org.mockito.BDDMockito.given;
 
-@WebMvcTest(controllers = UniversityGroupController.class)
+@WebMvcTest(controllers = UGroupController.class)
 @AutoConfigureMockMvc(addFilters = false)
 @ExtendWith(MockitoExtension.class)
 class UniversityGroupControllerTest {
 
     private final MockMvc mockMvc;
     private final ObjectMapper objectMapper;
-    private GroupResponseDTO groupResponseDTO;
+    private GroupDTO groupDTO;
 
     @MockBean
-    private UniversityGroupService universityGroupService;
+    private UGroupService universityGroupService;
 
     @Autowired
     UniversityGroupControllerTest(MockMvc mockMvc, ObjectMapper objectMapper) {
@@ -45,7 +45,7 @@ class UniversityGroupControllerTest {
 
     @BeforeEach
     void setUp() {
-        groupResponseDTO = GroupResponseDTO.builder()
+        groupDTO = GroupDTO.builder()
                 .id(1L)
                 .groupName("group")
                 .studentsAssignedToGroup(new ArrayList<>())
@@ -58,16 +58,16 @@ class UniversityGroupControllerTest {
                 .willAnswer(invocation -> invocation.getArgument(0));
         ResultActions response = mockMvc.perform(MockMvcRequestBuilders.post("/api/group")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(groupResponseDTO))
+                .content(objectMapper.writeValueAsString(groupDTO))
         );
         response.andExpect(MockMvcResultMatchers.status().isCreated())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.groupName", CoreMatchers.is(groupResponseDTO.groupName())));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groupName", CoreMatchers.is(groupDTO.groupName())));
     }
 
     @Test
     void getGroupById() throws Exception {
         Long id = 1L;
-        Mockito.when(universityGroupService.getUniversityGroupById(1L)).thenReturn(groupResponseDTO);
+        Mockito.when(universityGroupService.getUniversityGroupById(1L)).thenReturn(groupDTO);
         ResultActions response = mockMvc.perform(MockMvcRequestBuilders.get("/api/group/" + id)
                 .contentType(MediaType.APPLICATION_JSON)
         );
@@ -76,7 +76,7 @@ class UniversityGroupControllerTest {
 
     @Test
     void getAllGroups() throws Exception {
-        List<GroupResponseDTO> groups = List.of(groupResponseDTO);
+        List<GroupDTO> groups = List.of(groupDTO);
         Mockito.when(universityGroupService.getAllUniversityGroups()).thenReturn(groups);
         ResultActions response = mockMvc.perform(MockMvcRequestBuilders.get("/api/group")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -87,14 +87,14 @@ class UniversityGroupControllerTest {
     @Test
     void updateGroupById() throws Exception {
         Long id = 1L;
-        GroupResponseDTO responseDTO = GroupResponseDTO.builder()
+        GroupDTO responseDTO = GroupDTO.builder()
                 .groupName("updated_group")
                 .studentsAssignedToGroup(new ArrayList<>())
                 .build();
-        Mockito.when(universityGroupService.updateUniversityGroup(1L, groupResponseDTO)).thenReturn(responseDTO);
+        Mockito.when(universityGroupService.updateUniversityGroup(1L, groupDTO)).thenReturn(responseDTO);
         ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.put("/api/group/" + id)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(groupResponseDTO))
+                .content(objectMapper.writeValueAsString(groupDTO))
         );
         resultActions.andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.groupName", CoreMatchers.is(responseDTO.groupName())));

@@ -1,16 +1,12 @@
 package com.angel.uni.management.service;
 
-import com.angel.uni.management.dto.group.GroupRequestDTO;
-import com.angel.uni.management.dto.group.GroupResponseDTO;
+import com.angel.uni.management.dto.GroupDTO;
 import com.angel.uni.management.entity.UniversityGroup;
 import com.angel.uni.management.exceptions.ResourceNotFoundException;
-import com.angel.uni.management.mapper.group.UniversityGroupMapper;
-import com.angel.uni.management.mapper.group.UniversityGroupResponseDTOMapper;
-import com.angel.uni.management.mapper.group.UniversityGroupResponseEntityMapper;
+import com.angel.uni.management.mapper.group.GroupMapper;
 import com.angel.uni.management.mapper.student.StudentMapper;
-import com.angel.uni.management.mapper.student.StudentResponseEntityMapper;
-import com.angel.uni.management.repositories.UniversityGroupRepository;
-import com.angel.uni.management.service.impl.UniversityGroupServiceImpl;
+import com.angel.uni.management.repositories.UGroupRepository;
+import com.angel.uni.management.service.impl.UGroupServiceImpl;
 import org.apache.coyote.BadRequestException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,23 +28,19 @@ import static org.junit.jupiter.api.Assertions.*;
 class UniversityGroupServiceTest {
 
     @Mock
-    private UniversityGroupRepository universityGroupRepository;
+    private UGroupRepository universityGroupRepository;
 
     @InjectMocks
-    private UniversityGroupServiceImpl universityGroupService;
+    private UGroupServiceImpl universityGroupService;
 
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private UniversityGroupMapper universityGroupMapper;
+    private GroupMapper universityGroupMapper;
 
     @Mock
     private StudentMapper studentMapper;
 
-    @Mock
-    private StudentResponseEntityMapper studentResponseEntityMapper;
-
     private UniversityGroup universityGroup;
-    private GroupResponseDTO groupResponseDTO;
-    private GroupRequestDTO groupRequestDTO;
+    private GroupDTO groupDTO;
 
     @BeforeEach
     void setUp() {
@@ -58,27 +50,22 @@ class UniversityGroupServiceTest {
                 .studentsAssignedToGroup(new ArrayList<>())
                 .build();
 
-        groupResponseDTO = GroupResponseDTO.builder()
+        groupDTO = GroupDTO.builder()
                 .id(1L)
                 .groupName("group")
                 .studentsAssignedToGroup(new ArrayList<>())
-                .build();
-
-        groupRequestDTO = GroupRequestDTO.builder()
-                .groupName("group")
-                .studentIds(new ArrayList<>())
                 .build();
     }
 
     @Test
     void testCreateUniversityGroup() throws BadRequestException {
-        Mockito.when(universityGroupMapper.requestToEntity(groupRequestDTO)).thenReturn(universityGroup);
+        Mockito.when(universityGroupMapper.toEntity(groupDTO)).thenReturn(universityGroup);
         Mockito.when(universityGroupRepository.save(universityGroup)).thenReturn(universityGroup);
-        Mockito.when(universityGroupMapper.toResponseDTO(universityGroup)).thenReturn(groupResponseDTO);
+        Mockito.when(universityGroupMapper.toDTO(universityGroup)).thenReturn(groupDTO);
 
-        GroupRequestDTO result = universityGroupService.createUniversityGroup(groupRequestDTO);
+        GroupDTO result = universityGroupService.createUniversityGroup(groupDTO);
         assertNotNull(result);
-        assertEquals("group", groupRequestDTO.groupName());
+        assertEquals("group", result.groupName());
     }
 
     @Test
@@ -91,8 +78,8 @@ class UniversityGroupServiceTest {
     @Test
     void testGetUniversityGroupById() {
         Mockito.when(universityGroupRepository.findById(1L)).thenReturn(Optional.of(universityGroup));
-        Mockito.when(universityGroupMapper.toResponseDTO(universityGroup)).thenReturn(groupResponseDTO);
-        GroupResponseDTO result = universityGroupService.getUniversityGroupById(1L);
+        Mockito.when(universityGroupMapper.toDTO(universityGroup)).thenReturn(groupDTO);
+        GroupDTO result = universityGroupService.getUniversityGroupById(1L);
         assertDoesNotThrow(() -> universityGroupRepository.findById(1L));
         assertNotNull(result);
         assertEquals("group", result.groupName());
@@ -103,8 +90,8 @@ class UniversityGroupServiceTest {
         List<UniversityGroup> listOfGroup = new ArrayList<>();
         listOfGroup.add(universityGroup);
         Mockito.when(universityGroupRepository.findAll()).thenReturn(listOfGroup);
-        Mockito.when(universityGroupMapper.toResponseDTO(universityGroup)).thenReturn(groupResponseDTO);
-        List<GroupResponseDTO> results = universityGroupService.getAllUniversityGroups();
+        Mockito.when(universityGroupMapper.toDTO(universityGroup)).thenReturn(groupDTO);
+        List<GroupDTO> results = universityGroupService.getAllUniversityGroups();
         assertNotNull(results);
         assertDoesNotThrow(() -> results);
         Assertions.assertThat(results.size()).isGreaterThan(0);
@@ -119,7 +106,7 @@ class UniversityGroupServiceTest {
 
     @Test
     void testUpdateUniversityGroup() throws BadRequestException {
-        GroupResponseDTO updatedGroupResponseDTO = GroupResponseDTO.builder()
+        GroupDTO updatedGroupDTO = GroupDTO.builder()
                 .groupName("updated_group")
                 .studentsAssignedToGroup(new ArrayList<>())
                 .build();
@@ -127,9 +114,9 @@ class UniversityGroupServiceTest {
         UniversityGroup universityGroup = Mockito.mock(UniversityGroup.class);
         Mockito.when(universityGroupRepository.findById(1L)).thenReturn(Optional.of(universityGroup));
         Mockito.when(universityGroupRepository.save(universityGroup)).thenReturn(universityGroup);
-        Mockito.when(universityGroupMapper.toResponseDTO(universityGroup)).thenReturn(updatedGroupResponseDTO);
+        Mockito.when(universityGroupMapper.toDTO(universityGroup)).thenReturn(updatedGroupDTO);
 
-        GroupResponseDTO result = universityGroupService.updateUniversityGroup(1L, updatedGroupResponseDTO);
+        GroupDTO result = universityGroupService.updateUniversityGroup(1L, updatedGroupDTO);
 
         assertNotNull(result);
         assertEquals("updated_group", result.groupName());

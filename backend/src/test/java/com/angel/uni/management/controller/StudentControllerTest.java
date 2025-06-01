@@ -1,6 +1,7 @@
 package com.angel.uni.management.controller;
 
-import com.angel.uni.management.dto.student.StudentResponseDTO;
+import com.angel.uni.management.dto.StudentDTO;
+import com.angel.uni.management.dto.StudentDTO;
 import com.angel.uni.management.service.StudentService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.CoreMatchers;
@@ -38,11 +39,11 @@ class StudentControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private StudentResponseDTO studentResponseDTO;
+    private StudentDTO studentDto;
 
     @BeforeEach
     void setUp() {
-        studentResponseDTO = new StudentResponseDTO(1L, "username", List.of(), 5.50);
+        studentDto = new StudentDTO(1L, "username", List.of(), 5.50);
     }
 
 
@@ -51,16 +52,16 @@ class StudentControllerTest {
         given(studentService.createStudent(ArgumentMatchers.any())).willAnswer(invocation -> invocation.getArgument(0));
         ResultActions response = mockMvc.perform(post("/api/student")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(studentResponseDTO)));
+                .content(objectMapper.writeValueAsString(studentDto)));
         response.andExpect(MockMvcResultMatchers.status().isCreated())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.username", CoreMatchers.is(studentResponseDTO.username())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.averageGradeOverall", CoreMatchers.is(studentResponseDTO.averageGradeOverall())));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.username", CoreMatchers.is(studentDto.username())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.averageGradeOverall", CoreMatchers.is(studentDto.averageGradeOverall())));
     }
 
     @Test
     void testGetAllStudents() throws Exception {
-        StudentResponseDTO responseDTO = StudentResponseDTO.builder().username("username").averageGradeOverall(0.0).grades(List.of()).build();
-        List<StudentResponseDTO> responses = List.of(responseDTO);
+        StudentDTO responseDTO = StudentDTO.builder().username("username").averageGradeOverall(0.0).grades(List.of()).build();
+        List<StudentDTO> responses = List.of(responseDTO);
         Mockito.when(studentService.getAllStudents()).thenReturn(responses);
         ResultActions response = mockMvc.perform(get("/api/student")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -72,7 +73,7 @@ class StudentControllerTest {
     @Test
     void testGetStudentById() throws Exception {
         Long id = 1L;
-        StudentResponseDTO responseDTO = StudentResponseDTO.builder().username("username").averageGradeOverall(0.0).grades(List.of()).build();
+        StudentDTO responseDTO = StudentDTO.builder().username("username").averageGradeOverall(0.0).grades(List.of()).build();
         Mockito.when(studentService.getStudentById(id)).thenReturn(responseDTO);
         ResultActions response = mockMvc.perform(get("/api/student/" + id)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -84,13 +85,13 @@ class StudentControllerTest {
     @Test
     void testUpdateStudentById() throws Exception {
         Long id = 1L;
-        StudentResponseDTO responseDTO = StudentResponseDTO.builder().username("username").averageGradeOverall(5.5).grades(List.of()).build();
-        Mockito.when(studentService.updateStudent(id, studentResponseDTO)).thenReturn(responseDTO);
+        StudentDTO responseDTO = StudentDTO.builder().username("username").averageGradeOverall(5.5).grades(List.of()).build();
+        Mockito.when(studentService.updateStudent(id, studentDto)).thenReturn(responseDTO);
         ResultActions response = mockMvc.perform(put("/api/student/" + id)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(studentResponseDTO)));
+                .content(objectMapper.writeValueAsString(studentDto)));
         response.andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.username", CoreMatchers.is(studentResponseDTO.username())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.averageGradeOverall", CoreMatchers.is(studentResponseDTO.averageGradeOverall())));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.username", CoreMatchers.is(studentDto.username())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.averageGradeOverall", CoreMatchers.is(studentDto.averageGradeOverall())));
     }
 }

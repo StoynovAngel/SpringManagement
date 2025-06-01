@@ -54,19 +54,16 @@ public class TeacherServiceImpl implements TeacherService {
     }
 
     @Override
-    public TeacherDTO updateTeacher(Long id, TeacherDTO teacherDTO) throws BadRequestException {
+    public TeacherDTO updateTeacher(Long id, TeacherDTO teacherDTO) {
 
         if (teacherDTO == null) {
             throw new ResourceNotFoundException("Cannot update teacher: teacherDTO is null");
         }
 
         Teacher teacher = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Teacher not found with this id: " + id));
-        Teacher updatedTeacher = updateTeacherFields(teacherDTO, teacher);
-        return teacherMapper.toDTO(updatedTeacher);
-    }
+        teacherMapper.updateEntityFromDto(teacherDTO, teacher);
+        Teacher updated = repository.save(teacher);
 
-    private Teacher updateTeacherFields(TeacherDTO teacherDTO, Teacher teacher) {
-        teacher.setName(teacherDTO.name());
-        return repository.save(teacher);
+        return teacherMapper.toDTO(updated);
     }
 }

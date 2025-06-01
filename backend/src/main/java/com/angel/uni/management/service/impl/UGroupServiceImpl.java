@@ -55,16 +55,12 @@ public class UGroupServiceImpl implements UGroupService {
 
     @Override
     public GroupDTO updateUniversityGroup(Long id, GroupDTO groupDTO) throws BadRequestException {
-
         if (groupDTO == null) {
             throw new BadRequestException("Cannot update group: GroupDTO is null.");
         }
-
         UniversityGroup groupToBeEdited = universityGroupRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("University group not found with this id: " + id));
-        groupToBeEdited.setGroupName(groupDTO.groupName());
-        groupToBeEdited.setStudentsAssignedToGroup(groupToBeEdited.getStudentsAssignedToGroup());
-        universityGroupRepository.save(groupToBeEdited);
-
-        return groupMapper.toDTO(groupToBeEdited);
+        groupMapper.updateEntityFromDto(groupDTO, groupToBeEdited);
+        UniversityGroup updated = universityGroupRepository.save(groupToBeEdited);
+        return groupMapper.toDTO(updated);
     }
 }

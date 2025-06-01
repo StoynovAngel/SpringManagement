@@ -1,7 +1,6 @@
 package com.angel.uni.management.controller;
 
-import com.angel.uni.management.dto.subject.SubjectRequestDTO;
-import com.angel.uni.management.dto.subject.SubjectResponseDTO;
+import com.angel.uni.management.dto.SubjectDTO;
 import com.angel.uni.management.service.UniversitySubjectService;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,25 +22,25 @@ public class UniversitySubjectController {
 
     @PostMapping
     @ResponseStatus(value = HttpStatus.CREATED)
-    public SubjectRequestDTO createSubject(@RequestBody SubjectRequestDTO subjectDTO) throws BadRequestException {
+    public SubjectDTO createSubject(@RequestBody SubjectDTO subjectDTO) throws BadRequestException {
         return subjectService.createSubject(subjectDTO);
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(value = HttpStatus.OK)
-    public SubjectResponseDTO getSubjectById(@PathVariable("id") Long id) {
+    public SubjectDTO getSubjectById(@PathVariable("id") Long id) {
         return subjectService.getSubjectById(id);
     }
 
     @GetMapping
     @ResponseStatus(value = HttpStatus.OK)
-    public List<SubjectResponseDTO> getAllSubjects() {
+    public List<SubjectDTO> getAllSubjects() {
         return subjectService.getAllSubjects();
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(value = HttpStatus.OK)
-    public SubjectResponseDTO updateSubject(@RequestBody SubjectResponseDTO subjectDTO) throws BadRequestException {
+    public SubjectDTO updateSubject(@RequestBody SubjectDTO subjectDTO) throws BadRequestException {
         return subjectService.updateSubject(subjectDTO);
     }
 }

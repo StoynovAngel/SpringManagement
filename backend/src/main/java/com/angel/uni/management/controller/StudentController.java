@@ -1,7 +1,6 @@
 package com.angel.uni.management.controller;
 
-import com.angel.uni.management.dto.student.StudentRequestDTO;
-import com.angel.uni.management.dto.student.StudentResponseDTO;
+import com.angel.uni.management.dto.StudentDTO;
 import com.angel.uni.management.service.StudentService;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,25 +18,25 @@ public class StudentController {
 
     @PostMapping
     @ResponseStatus(value = HttpStatus.CREATED)
-    public StudentRequestDTO createStudent(@RequestBody StudentRequestDTO studentRequestDTO) throws BadRequestException {
-        return studentService.createStudent(studentRequestDTO);
+    public StudentDTO createStudent(@RequestBody StudentDTO studentDTO) throws BadRequestException {
+        return studentService.createStudent(studentDTO);
     }
 
     @GetMapping
     @ResponseStatus(value = HttpStatus.OK)
-    public List<StudentResponseDTO> getAllStudents() {
+    public List<StudentDTO> getAllStudents() {
         return studentService.getAllStudents();
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(value = HttpStatus.OK)
-    public StudentResponseDTO getStudentById(@PathVariable("id") Long id) {
+    public StudentDTO getStudentById(@PathVariable("id") Long id) {
         return studentService.getStudentById(id);
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(value = HttpStatus.OK)
-    public StudentResponseDTO updateStudentById(@PathVariable("id") Long id, @RequestBody StudentResponseDTO studentResponseDTO) throws BadRequestException {
-        return studentService.updateStudent(id, studentResponseDTO);
+    public StudentDTO updateStudentById(@PathVariable("id") Long id, @RequestBody StudentDTO studentDTO) throws BadRequestException {
+        return studentService.updateStudent(id, studentDTO);
     }
 }
